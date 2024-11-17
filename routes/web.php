@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Response;
+
 class Task
 {
     public function __construct(
@@ -8,7 +11,7 @@ class Task
         public string $description,
         public ?string $long_description,
         public bool $completed,
-        public string $create_at,
+        public string $created_at,
         public string $updated_at,
     ) {}
 }
@@ -31,8 +34,8 @@ $tasks = [
         false,
         '2023-03-02 12:00:00',
         '2023-03-02 12:00:00'
-      ),
-      new Task(
+    ),
+    new Task(
         3,
         'Learn programming',
         'Task 3 description',
@@ -40,8 +43,8 @@ $tasks = [
         true,
         '2023-03-03 12:00:00',
         '2023-03-03 12:00:00'
-      ),
-      new Task(
+    ),
+    new Task(
         4,
         'Take dogs for a walk',
         'Task 4 description',
@@ -49,32 +52,40 @@ $tasks = [
         false,
         '2023-03-04 12:00:00',
         '2023-03-04 12:00:00'
-      ),
+    ),
 ];
 
-use Illuminate\Support\Facades\Route;
+Route::get('/', function () {
+    return redirect()->route('tasks.index');
+});
 
-Route::get('/', function () use ($tasks) {
+Route::get('/tasks', function () use ($tasks) {
     return view('index', [
         'tasks' => $tasks,
     ]);
 })->name('tasks.index');
 
 // Get a single route;
-Route::get('/{id}', function($id) {
-    return 'This is a single taks';
+Route::get('/tasks/{id}', function ($id) use ($tasks) {
+    $task = collect($tasks)->firstWhere('id', $id);
+
+    if (!$task) {
+        abort(Response::HTTP_NOT_FOUND);
+    }
+
+    return view('show', ['task' => $task]);
 })->name('tasks.show');
 
 
-Route::get('/profile', function () {
-    return 'Profile page';
-})->name('profile');
+// Route::get('/profile', function () {
+//     return 'Profile page';
+// })->name('profile');
 
-Route::get('/hallo', function () {
-    return redirect()->route('profile');
-});
+// Route::get('/hallo', function () {
+//     return redirect()->route('profile');
+// });
 
-// Defining fallback routes;
-Route::fallback(function () {
-    return '404';
-});
+// // Defining fallback routes;
+// Route::fallback(function () {
+//     return '404';
+// });
