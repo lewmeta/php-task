@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Response;
+use App\Models\Task as ModelsTask;
 
 class Task
 {
@@ -59,23 +60,16 @@ Route::get('/', function () {
     return redirect()->route('tasks.index');
 });
 
-Route::get('/tasks', function () use ($tasks) {
+Route::get('/tasks', function ()  {
     return view('index', [
-        'tasks' => $tasks,
+        'tasks' => ModelsTask::latest()->where('completed', !true)->get(),
     ]);
 })->name('tasks.index');
 
 // Get a single route;
-Route::get('/tasks/{id}', function ($id) use ($tasks) {
-    $task = collect($tasks)->firstWhere('id', $id);
-
-    if (!$task) {
-        abort(Response::HTTP_NOT_FOUND);
-    }
-
-    return view('show', ['task' => $task]);
+Route::get('/tasks/{id}', function ($id) {
+    return view('show', ['task' => ModelsTask::findOrFail($id)]);
 })->name('tasks.show');
-
 
 // Route::get('/profile', function () {
 //     return 'Profile page';
