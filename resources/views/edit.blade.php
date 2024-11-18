@@ -14,7 +14,8 @@
 @section('content')
     <form method="POST" action="{{ route('tasks.update', ['task' => $task->id]) }}">
         @csrf
-        @method('PUT')
+        @method('PUT') 
+        {{-- The above is method spoofing because forms only allow GET AND POST requests --}}
         <div>
             <label for="title">
                 Title

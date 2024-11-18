@@ -62,6 +62,12 @@ Route::post('/tasks', function (TaskRequest $request) {
     return redirect()->route('tasks.show', ['task' => $task->id])->with('success', 'Task created!');
 })->name('tasks.store');
 
+Route::delete('/tasks/{task}', function (Task $task) {
+    // (Task $task) is route model binding;
+    $task->delete();
+
+    return redirect()->route('tasks.index')->with('success', "Task deleted!");
+})->name('tasks.destroy');
 
 // Route::get('/profile', function () {
 //     return 'Profile page';
