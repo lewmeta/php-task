@@ -4,6 +4,12 @@
 
     @section('content')
         <!-- @if (count($tasks)) -->
+
+        <div>
+            <a href="{{ route('tasks.create') }}">
+                Add task
+            </a>
+        </div>
         @forelse($tasks as $task)
             <div>
                 <a href="{{ route('tasks.show', ['task' => $task->id]) }}">
