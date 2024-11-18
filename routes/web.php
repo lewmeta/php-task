@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\TaskRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -18,48 +19,47 @@ Route::get('/tasks', function () {
 Route::view('tasks/create', 'create')->name('task-create');
 
 // Edit a single route;
-Route::get('/tasks/{id}/edit', function ($id) {
-    return view('edit', ['task' => Task::findOrFail($id)]);
+Route::get('/tasks/{task}/edit', function (Task $task) {
+    return view('edit', ['task' => $task]);
 })->name('tasks.edit');
 
 // Get a single route;
-Route::get('/tasks/{id}', function ($id) {
-    return view('show', ['task' => Task::findOrFail($id)]);
+Route::get('/tasks/{task}', function (Task $task) {
+    return view(
+        'show',
+        ['task' => $task]
+        // ['task' => Task::findOrFail($id)]
+    );
 })->name('tasks.show');
 
 // PATCH ROUTE
-Route::put('/tasks/{id}', function (Request $request, $id) {
-    // validate the data;
-    $data = $request->validate([
-        'title' => 'required | max:255',
-        'description' => 'required',
-        'long_description' => 'required'
-    ]);
+Route::put('/tasks/{task}', function (TaskRequest $request, Task $task) {
+    // validated data from TaskRequest;
+    // $data = $request -> validated();
 
-    // findOrFail By ID;
-    $task = Task::findOrFail($id);
-    $task->title = $data['title'];
-    $task->description = $data['description'];
-    $task->long_description = $data['long_description'];
-    $task->save();
+    // // findOrFail By ID;
 
-    return redirect()->route('tasks.show', ['id'=> $task->id])->with('success', 'Task updated!');
+    // $task->title = $data['title'];
+    // $task->description = $data['description'];
+    // $task->long_description = $data['long_description'];
+    // $task->save();
+    $task->update($request->validated());
+
+    return redirect()->route('tasks.show', ['task' => $task->id])->with('success', 'Task updated!');
 })->name('tasks.update');
 
-Route::post('/tasks', function (Request $request) {
-    $data = $request->validate([
-        'title' => 'required|max:255',
-        'description' => 'required',
-        'long_description' => 'required'
-    ]);
+Route::post('/tasks', function (TaskRequest $request) {
+    // $data = $request->validated();
 
-    $task = new Task();
-    $task->title = $data['title'];
-    $task->description = $data['description'];
-    $task->long_description = $data['long_description'];
-    $task->save();
+    // $task = new Task();
+    // $task->title = $data['title'];
+    // $task->description = $data['description'];
+    // $task->long_description = $data['long_description'];
+    // $task->save();
 
-    return redirect()->route('tasks.show', ['id' => $task->id])->with('success', 'Task created!');
+    $task = Task::create($request->validated());
+
+    return redirect()->route('tasks.show', ['task' => $task->id])->with('success', 'Task created!');
 })->name('tasks.store');
 
 
